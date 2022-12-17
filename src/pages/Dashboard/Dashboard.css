@@ -1,0 +1,29 @@
+/* button styles */
+.navbtn{
+    width: 15rem;
+    height: 3rem;
+    border-radius: 20px;
+    transition: all 0.5s ease;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.navbtn:hover{
+    transition: all 0.5s ease;
+    /* transform: scale(1.1); */
+    animation: popin 2s linear 0s infinite alternate;
+}
+
+/* dashboard styles */
+.dashboard{
+    width: 100vw;
+    height: 100vh;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+}
