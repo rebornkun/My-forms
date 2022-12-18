@@ -1,7 +1,7 @@
 import './Signin.css'
 import { ColorModeContext, tokens } from "../../theme";
-import { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useContext, useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 const GoogleBtn = ({text}) => {
 
@@ -44,6 +44,7 @@ const Signin = () => {
     const colors = tokens(theme.palette.mode)
 
     const [passwordShow, setPasswordShow] = useState(false)
+    const location = useLocation()
     const togglePasswordShow = () => {
         const passwordfield = document.querySelector('#signin_password');
 
@@ -56,11 +57,31 @@ const Signin = () => {
         }
     }
 
+    useEffect(()=>{
+        checkRouteForSwap()
+    },[location])
+
+    const checkRouteForSwap = () => {
+        
+        if(location.pathname === "/signin"){
+            document.querySelector('.login_block').classList.add('active')
+            document.querySelector('.register_block').classList.remove('active')
+        }else if(location.pathname === "/signup"){
+            document.querySelector('.login_block').classList.remove('active')
+            document.querySelector('.register_block').classList.add('active')
+        }
+
+    }
+
+    const handleSignInBtn = (values) => {
+        console.log(values)
+    }
+
     return (
         <div className='main_cover' style={{ backgroundColor: theme.palette.background.default }}>
             
             {/* login block */}
-            <div className='outer_container'  style={{ 
+            <div className='outer_container login_block'  style={{ 
                 backgroundColor: theme.palette.background.default, 
                 boxShadow: `0px 0px 10px 1px ${colors.grey[800]}`}}>
                 <div className='inner_container' style={{ 
@@ -71,7 +92,7 @@ const Signin = () => {
 
                     <div className='login_form form_container'>
                         <h2 className='header' style={{ color: theme.palette.secondary.main}}>My Forms</h2>
-                        <GoogleBtn />
+                        <GoogleBtn text={'Sign In with Google'} />
                         <div className="or">
                             <div style={{ backgroundColor: colors.grey[300]}}></div>
                             <p>or</p>
@@ -144,7 +165,7 @@ const Signin = () => {
             </div>
             
             {/* register block */}
-            <div className='outer_container'  style={{ 
+            <div className='outer_container register_block'  style={{ 
                 backgroundColor: theme.palette.background.default, 
                 boxShadow: `0px 0px 10px 1px ${colors.grey[800]}`}}>
                 <div className='inner_container' style={{ 
@@ -155,7 +176,7 @@ const Signin = () => {
 
                     <div className='resgister_form form_container'>
                         <h2 className='header' style={{ color: theme.palette.secondary.main}}>My Forms</h2>
-                        <GoogleBtn text={'Sign In with Google'}/>
+                        <GoogleBtn text={'Sign Up with Google'}/>
                         <div className="or">
                             <div style={{ backgroundColor: colors.grey[300]}}></div>
                             <p>or</p>
@@ -163,13 +184,27 @@ const Signin = () => {
                         </div>
 
                         <div className="inputs">
-                            <div className="emailfield inputfield">
+                            <div className="email_field inputfield">
                                 <label htmlFor="Email"
                                     style={{color: theme.palette.secondary.main}}>Email</label>
                                 <input 
                                 type='email'
                                 id="Email"
                                 name="Email"
+                                placeholder="e.g abc@gmail.com"
+                                autoComplete="email"
+                                style={{
+                                    borderBottom: `1px solid ${colors.grey[300]}`
+                                }}
+                                />
+                            </div>
+                            <div className="confirm_email_field inputfield">
+                                <label htmlFor="ConfirmEmail"
+                                    style={{color: theme.palette.secondary.main}}>Confirm Email</label>
+                                <input 
+                                type='email'
+                                id="ConfirmEmail"
+                                name="ConfirmEmail"
                                 placeholder="e.g abc@gmail.com"
                                 autoComplete="email"
                                 style={{
@@ -207,19 +242,74 @@ const Signin = () => {
                                 }
 
                             </div>
-                            <div className="remeber_forget">
-                            <div className="remeberme_check">
-                                <input
-                                type='checkbox'
+                            <div className="user_name inputfield">
+                                <label htmlFor="UserName"
+                                    style={{color: theme.palette.secondary.main}}>What should we call you?</label>
+                                <input 
+                                type='text'
+                                id="UserName"
+                                name="UserName"
+                                placeholder="e.g dey_play4"
+                                autoComplete={false}
+                                autoCorrect={false}
+                                style={{
+                                    borderBottom: `1px solid ${colors.grey[300]}`
+                                }}
                                 />
-                                <p>Remeber me for 30 days</p>
                             </div>
-                            <p className="forgot_password">Forgot password?</p>
+                            <div className="d_o_b inputfield">
+                                <label htmlFor="Dob" 
+                                style={{color: theme.palette.secondary.main}}>What's your date of birth?</label>
+                                <input 
+                                type='date'
+                                id="Dob"
+                                name="Dob"
+                                autoComplete={false}
+                                style={{color: colors.redAccent[500]}}
+                                />
+                            </div>
+                            <div className="gender inputfield">
+                                <label style={{color: theme.palette.secondary.main}}>
+                                    <input
+                                    type="radio"
+                                    value="Male"
+                                    name="gender"
+                                    className="gender_radio"
+                                    // checked={this.state.selectedOption === "Male"}
+                                    // onChange={this.onValueChange}
+                                    />
+                                    Male
+                                </label>
+                                <label style={{color: theme.palette.secondary.main}}>
+                                    <input
+                                    type="radio"
+                                    value="Female"
+                                    name="gender"
+                                    className="gender_radio"
+                                    // checked={this.state.selectedOption === "Female"}
+                                    // onChange={this.onValueChange}
+                                    />
+                                    Female
+                                </label>
+                                <label style={{color: theme.palette.secondary.main}}>
+                                    <input
+                                    type="radio"
+                                    value="Prefer Not to say"
+                                    name="gender"
+                                    className="gender_radio"
+                                    // checked={this.state.selectedOption === "Prefer Not to say"}
+                                    // onChange={this.onValueChange}
+                                    />
+                                    Prefer Not to say
+                                </label>
+                            </div>
+                            <div className="terms_conditions">
+                                <p style={{color: colors.redAccent[300]}}>By clicking on sign-up, you agree to the Musica <a>Terms and Conditions</a> and <a>Privacy Policy</a>.</p>
                             </div>
                         </div>
-                        <Btn text='Sign In' />
+                        <Btn text='Sign Up' />
                         <div className="form_field_lastpart">
-                            <p>Don't have an account? <Link style={{color: theme.palette.secondary.main}} to='/signup'>Sign up for free</Link></p>
+                            <p>Already have an account? <Link style={{color: theme.palette.secondary.main}} to='/signin'>Sign in now!</Link></p>
                         </div>
                     </div>
 

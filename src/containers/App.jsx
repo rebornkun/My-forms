@@ -18,7 +18,7 @@ function App() {
         <Routes>
           <Route path='/' element={<Dashboard />}/>
           <Route path='/signin' element={<Signin />}/>
-          <Route path='/signin' element={<Signin />}/>
+          <Route path='/signup' element={<Signin />}/>
         </Routes>
       </div>
     </ColorModeContext.Provider>
