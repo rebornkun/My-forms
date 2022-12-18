@@ -3,7 +3,7 @@ import { ColorModeContext, tokens } from "../../theme";
 import { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import * as yup from 'yup';
-import { Formik } from 'formik';
+import { Formik, useFormik } from 'formik';
 
 const GoogleBtn = ({text}) => {
 
@@ -33,10 +33,10 @@ const Btn = ({name, text}) => {
     
     return (
         <Link className='text-link' to={name} >
-            <div className='btn' style={{ 
+            <button type='submit' className='btn' style={{ 
                 backgroundColor: colors.greenAccent[600]}} >
                 <p style={{color: colors.grey[100]}}>{text}</p>
-            </div>
+            </button>
         </Link>
     );
 }
@@ -96,14 +96,18 @@ const Signin = () => {
     }
 
     //handle registration
-    const registerInitialValues = {
-        email: "",
-        confirmEmail: "",
-        password: "",
-        userName: "",
-        dateOfBirth: "",
-        gender: ""
-    }
+    
+    const { values, handleBlur, handleChange } = useFormik({
+        initialValues: {
+            regEmail: "",
+            confirmEmail: "",
+            regPassword: "",
+            userName: "",
+            dateOfBirth: "",
+            gender: ""
+        }
+    })
+    
     const handleRegisterSubmit = (values) => {
         console.log(values)
     }
@@ -115,6 +119,8 @@ const Signin = () => {
         dateOfBirth: yup.string().required("required"),
         gender: yup.string().required("required")
     })
+
+    console.log(values)
 
     return (
         <div className='main_cover' style={{ backgroundColor: theme.palette.background.default }}>
@@ -217,160 +223,163 @@ const Signin = () => {
                 boxShadow: `0px 0px 10px 1px ${colors.grey[800]}`}}>
 
                     {/* resgister form */}
-                    <Formik
-                    onSubmit={handleRegisterSubmit}
-                    initialValues={registerInitialValues}
-                    validationSchema={registerSchema}>
+                    <form className='resgister_form form_container'>
+                    <h2 className='header' style={{ color: theme.palette.secondary.main}}>My Forms</h2>
+                    <GoogleBtn text={'Sign Up with Google'}/>
+                    <div className="or">
+                        <div style={{ backgroundColor: colors.grey[300]}}></div>
+                        <p>or</p>
+                        <div style={{ backgroundColor: colors.grey[300]}}></div>
+                    </div>
 
-                        {({ values, errors, touched, handleBlur, handleChange, handleSubmit }) => (
+                    <div className="inputs">
+                        <div className="email_field inputfield">
+                            <label htmlFor="regEmail"
+                                style={{color: theme.palette.secondary.main}}>Email</label>
+                            <input 
+                            type='email'
+                            id="regEmail"
+                            name="regEmail"
+                            placeholder="e.g abc@gmail.com"
+                            autoComplete="email"
+                            value={values.regEmail}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            // error={!!touched.email}
+                            // helperText={touched.email && errors.email}
+                            style={{
+                                borderBottom: `1px solid ${colors.grey[300]}`
+                            }}
+                            />
+                        </div>
+                        <div className="confirm_email_field inputfield">
+                            <label htmlFor="confirmEmail"
+                                style={{color: theme.palette.secondary.main}}>Confirm Email</label>
+                            <input 
+                            type='email'
+                            id="confirmEmail"
+                            name="confirmEmail"
+                            placeholder="e.g abc@gmail.com"
+                            autoComplete="email"
+                            value={values.confirmEmail}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            style={{
+                                borderBottom: `1px solid ${colors.grey[300]}`
+                            }}
+                            />
+                        </div>
+                        <div className="passwordfield inputfield">
+                            <label htmlFor="regPassword"
+                            style={{color: theme.palette.secondary.main}}>Password</label>
+                            <input 
+                            id="reg_password"
+                            name="regPassword"
+                            type='password'
+                            autocomplete="current-password"
+                            autoCorrect={false}
+                            value={values.regPassword}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            style={{
+                                borderBottom: `1px solid ${colors.grey[300]}`
+                            }}
+                            />
+                            {
+                            !passwordShow ? 
+                            <svg onClick={togglePasswordShowTwo} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M15.1614 12.0531C15.1614 13.7991 13.7454 15.2141 11.9994 15.2141C10.2534 15.2141 8.83838 13.7991 8.83838 12.0531C8.83838 10.3061 10.2534 8.89111 11.9994 8.89111C13.7454 8.89111 15.1614 10.3061 15.1614 12.0531Z" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.998 19.3549C15.806 19.3549 19.289 16.6169 21.25 12.0529C19.289 7.48892 15.806 4.75092 11.998 4.75092H12.002C8.194 4.75092 4.711 7.48892 2.75 12.0529C4.711 16.6169 8.194 19.3549 12.002 19.3549H11.998Z" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            :
+                            <svg onClick={togglePasswordShowTwo} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9.76057 14.3668C9.18557 13.7928 8.83557 13.0128 8.83557 12.1378C8.83557 10.3848 10.2476 8.9718 11.9996 8.9718C12.8666 8.9718 13.6646 9.3228 14.2296 9.8968" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M15.1047 12.6989C14.8727 13.9889 13.8567 15.0069 12.5677 15.2409" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M6.65451 17.4723C5.06751 16.2263 3.72351 14.4063 2.74951 12.1373C3.73351 9.85829 5.08651 8.02829 6.68351 6.77229C8.27051 5.51629 10.1015 4.83429 11.9995 4.83429C13.9085 4.83429 15.7385 5.52629 17.3355 6.79129" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M19.4475 8.99078C20.1355 9.90478 20.7405 10.9598 21.2495 12.1368C19.2825 16.6938 15.8065 19.4388 11.9995 19.4388C11.1365 19.4388 10.2855 19.2988 9.46753 19.0258" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M19.8868 4.24957L4.11279 20.0236" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            }
 
-                            <form className='resgister_form form_container' onSubmit={handleSubmit}>
-                            <h2 className='header' style={{ color: theme.palette.secondary.main}}>My Forms</h2>
-                            <GoogleBtn text={'Sign Up with Google'}/>
-                            <div className="or">
-                                <div style={{ backgroundColor: colors.grey[300]}}></div>
-                                <p>or</p>
-                                <div style={{ backgroundColor: colors.grey[300]}}></div>
-                            </div>
-
-                            <div className="inputs">
-                                <div className="email_field inputfield">
-                                    <label htmlFor="regEmail"
-                                        style={{color: theme.palette.secondary.main}}>Email</label>
-                                    <input 
-                                    type='email'
-                                    id="regEmail"
-                                    name="regEmail"
-                                    placeholder="e.g abc@gmail.com"
-                                    autoComplete="email"
-                                    onBlur={handleBlur}
-                                    onChange={handleChange}
-                                    value={values.email}
-                                    error={!!touched.email}
-                                    helperText={touched.email && errors.email}
-                                    style={{
-                                        borderBottom: `1px solid ${colors.grey[300]}`
-                                    }}
-                                    />
-                                </div>
-                                <div className="confirm_email_field inputfield">
-                                    <label htmlFor="ConfirmEmail"
-                                        style={{color: theme.palette.secondary.main}}>Confirm Email</label>
-                                    <input 
-                                    type='email'
-                                    id="ConfirmEmail"
-                                    name="ConfirmEmail"
-                                    placeholder="e.g abc@gmail.com"
-                                    autoComplete="email"
-                                    style={{
-                                        borderBottom: `1px solid ${colors.grey[300]}`
-                                    }}
-                                    />
-                                </div>
-                                <div className="passwordfield inputfield">
-                                    <label htmlFor="regPassword"
-                                    style={{color: theme.palette.secondary.main}}>Password</label>
-                                    <input 
-                                    id="reg_password"
-                                    name="regPassword"
-                                    type='password'
-                                    autocomplete="current-password"
-                                    autoCorrect={false}
-                                    style={{
-                                        borderBottom: `1px solid ${colors.grey[300]}`
-                                    }}
-                                    />
-                                    {
-                                    !passwordShow ? 
-                                    <svg onClick={togglePasswordShowTwo} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M15.1614 12.0531C15.1614 13.7991 13.7454 15.2141 11.9994 15.2141C10.2534 15.2141 8.83838 13.7991 8.83838 12.0531C8.83838 10.3061 10.2534 8.89111 11.9994 8.89111C13.7454 8.89111 15.1614 10.3061 15.1614 12.0531Z" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M11.998 19.3549C15.806 19.3549 19.289 16.6169 21.25 12.0529C19.289 7.48892 15.806 4.75092 11.998 4.75092H12.002C8.194 4.75092 4.711 7.48892 2.75 12.0529C4.711 16.6169 8.194 19.3549 12.002 19.3549H11.998Z" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                    :
-                                    <svg onClick={togglePasswordShowTwo} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M9.76057 14.3668C9.18557 13.7928 8.83557 13.0128 8.83557 12.1378C8.83557 10.3848 10.2476 8.9718 11.9996 8.9718C12.8666 8.9718 13.6646 9.3228 14.2296 9.8968" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M15.1047 12.6989C14.8727 13.9889 13.8567 15.0069 12.5677 15.2409" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M6.65451 17.4723C5.06751 16.2263 3.72351 14.4063 2.74951 12.1373C3.73351 9.85829 5.08651 8.02829 6.68351 6.77229C8.27051 5.51629 10.1015 4.83429 11.9995 4.83429C13.9085 4.83429 15.7385 5.52629 17.3355 6.79129" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M19.4475 8.99078C20.1355 9.90478 20.7405 10.9598 21.2495 12.1368C19.2825 16.6938 15.8065 19.4388 11.9995 19.4388C11.1365 19.4388 10.2855 19.2988 9.46753 19.0258" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M19.8868 4.24957L4.11279 20.0236" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                    }
-
-                                </div>
-                                <div className="user_name inputfield">
-                                    <label htmlFor="UserName"
-                                        style={{color: theme.palette.secondary.main}}>What should we call you?</label>
-                                    <input 
-                                    type='text'
-                                    id="UserName"
-                                    name="UserName"
-                                    placeholder="e.g dey_play4"
-                                    autoComplete={false}
-                                    autoCorrect={false}
-                                    style={{
-                                        borderBottom: `1px solid ${colors.grey[300]}`
-                                    }}
-                                    />
-                                </div>
-                                <div className="d_o_b inputfield">
-                                    <label htmlFor="Dob" 
-                                    style={{color: theme.palette.secondary.main}}>What's your date of birth?</label>
-                                    <input 
-                                    type='date'
-                                    id="Dob"
-                                    name="Dob"
-                                    autoComplete={false}
-                                    style={{color: colors.redAccent[500]}}
-                                    />
-                                </div>
-                                <div className="gender inputfield">
-                                    <label style={{color: theme.palette.secondary.main}}>
-                                        <input
-                                        type="radio"
-                                        value="Male"
-                                        name="gender"
-                                        className="gender_radio"
-                                        // checked={this.state.selectedOption === "Male"}
-                                        // onChange={this.onValueChange}
-                                        />
-                                        Male
-                                    </label>
-                                    <label style={{color: theme.palette.secondary.main}}>
-                                        <input
-                                        type="radio"
-                                        value="Female"
-                                        name="gender"
-                                        className="gender_radio"
-                                        // checked={this.state.selectedOption === "Female"}
-                                        // onChange={this.onValueChange}
-                                        />
-                                        Female
-                                    </label>
-                                    <label style={{color: theme.palette.secondary.main}}>
-                                        <input
-                                        type="radio"
-                                        value="Prefer Not to say"
-                                        name="gender"
-                                        className="gender_radio"
-                                        // checked={this.state.selectedOption === "Prefer Not to say"}
-                                        // onChange={this.onValueChange}
-                                        />
-                                        Prefer Not to say
-                                    </label>
-                                </div>
-                                <div className="terms_conditions">
-                                    <p style={{color: colors.redAccent[300]}}>By clicking on sign-up, you agree to the Musica <a>Terms and Conditions</a> and <a>Privacy Policy</a>.</p>
-                                </div>
-                            </div>
-                            <Btn text='Sign Up' />
-                            <div className="form_field_lastpart">
-                                <p>Already have an account? <Link style={{color: theme.palette.secondary.main}} to='/signin'>Sign in now!</Link></p>
-                            </div>
-                            </form>
-
-                        )}
-                    </Formik>
+                        </div>
+                        <div className="user_name inputfield">
+                            <label htmlFor="userName"
+                                style={{color: theme.palette.secondary.main}}>What should we call you?</label>
+                            <input 
+                            type='text'
+                            id="userName"
+                            name="userName"
+                            placeholder="e.g dey_play4"
+                            autoComplete={false}
+                            autoCorrect={false}
+                            value={values.userName}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            style={{
+                                borderBottom: `1px solid ${colors.grey[300]}`
+                            }}
+                            />
+                        </div>
+                        <div className="d_o_b inputfield">
+                            <label htmlFor="dateOfBirth" 
+                            style={{color: theme.palette.secondary.main}}>What's your date of birth?</label>
+                            <input 
+                            type='date'
+                            id="dateOfBirth"
+                            name="dateOfBirth"
+                            autoComplete={false}
+                            value={values.dateOfBirth}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            style={{color: colors.redAccent[500]}}
+                            />
+                        </div>
+                        <div className="gender inputfield">
+                            <label style={{color: theme.palette.secondary.main}}>
+                                <input
+                                type="radio"
+                                value="Male"
+                                name="gender"
+                                className="gender_radio"
+                                // checked={this.state.selectedOption === "Male"}
+                                // onChange={this.onValueChange}
+                                />
+                                Male
+                            </label>
+                            <label style={{color: theme.palette.secondary.main}}>
+                                <input
+                                type="radio"
+                                value="Female"
+                                name="gender"
+                                className="gender_radio"
+                                // checked={this.state.selectedOption === "Female"}
+                                // onChange={this.onValueChange}
+                                />
+                                Female
+                            </label>
+                            <label style={{color: theme.palette.secondary.main}}>
+                                <input
+                                type="radio"
+                                value="Prefer Not to say"
+                                name="gender"
+                                className="gender_radio"
+                                // checked={this.state.selectedOption === "Prefer Not to say"}
+                                // onChange={this.onValueChange}
+                                />
+                                Prefer Not to say
+                            </label>
+                        </div>
+                        <div className="terms_conditions">
+                            <p style={{color: colors.redAccent[300]}}>By clicking on sign-up, you agree to the Musica <a>Terms and Conditions</a> and <a>Privacy Policy</a>.</p>
+                        </div>
+                    </div>
+                    <button type='submit'></button>
+                    <Btn type='submit' text='Sign Up' />
                     
+                    <div className="form_field_lastpart">
+                        <p>Already have an account? <Link style={{color: theme.palette.secondary.main}} to='/signin'>Sign in now!</Link></p>
+                    </div>
+                    </form>
 
 
                 </div>
