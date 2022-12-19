@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import { ColorModeContext, useMode } from '../theme'
 import Dashboard from '../pages/Dashboard/Dashboard'

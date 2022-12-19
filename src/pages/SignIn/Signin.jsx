@@ -4,26 +4,28 @@ import { Component, useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import * as yup from 'yup';
 import { Formik, useFormik } from 'formik';
+import jwtDecode from 'jwt-decode';
+import { useGoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 
-const GoogleBtn = ({text}) => {
+const GoogleBtn = ({text, onClickAction}) => {
 
     const { theme, colorMode } = useContext(ColorModeContext)
     const colors = tokens(theme.palette.mode)
     
     return (
-        <Link className='text-link' to={name} >
-            <div className='btn' style={{ 
-                backgroundColor: theme.palette.neutral.dark}} >
-                {/* google logo svg */}
-                <svg width="30" height="30" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M30.0014 16.3109C30.0014 15.1598 29.9061 14.3198 29.6998 13.4487H16.2871V18.6442H24.1601C24.0014 19.9354 23.1442 21.8798 21.2394 23.1864L21.2127 23.3604L25.4536 26.58L25.7474 26.6087C28.4458 24.1665 30.0014 20.5731 30.0014 16.3109Z" fill="#4285F4"/>
-                    <path d="M16.2862 30C20.1433 30 23.3814 28.7555 25.7465 26.6089L21.2386 23.1865C20.0322 24.011 18.4132 24.5866 16.2862 24.5866C12.5085 24.5866 9.30219 22.1444 8.15923 18.7688L7.9917 18.7827L3.58202 22.1272L3.52435 22.2843C5.87353 26.8577 10.6989 30 16.2862 30Z" fill="#34A853"/>
-                    <path d="M8.16007 18.7688C7.85848 17.8977 7.68395 16.9643 7.68395 15.9999C7.68395 15.0354 7.85849 14.1021 8.1442 13.231L8.13621 13.0455L3.67126 9.64734L3.52518 9.71544C2.55696 11.6132 2.0014 13.7444 2.0014 15.9999C2.0014 18.2555 2.55696 20.3865 3.52518 22.2843L8.16007 18.7688Z" fill="#FBBC05"/>
-                    <path d="M16.2863 7.4133C18.9688 7.4133 20.7783 8.54885 21.8101 9.4978L25.8418 5.64C23.3657 3.38445 20.1434 2 16.2863 2C10.699 2 5.87354 5.1422 3.52435 9.71549L8.14339 13.2311C9.30223 9.85555 12.5086 7.4133 16.2863 7.4133Z" fill="#EB4335"/>
-                </svg>
-                <p style={{color: colors.grey[100]}}>{text}</p>
-            </div>
-        </Link>
+        <div id='googleButton' className='btn' onClick={onClickAction} style={{ 
+            backgroundColor: theme.palette.neutral.dark,
+            fontFamily: `'Quicksand', sans-serif`}} >
+            {/* google logo svg */}
+            <svg width="30" height="30" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M30.0014 16.3109C30.0014 15.1598 29.9061 14.3198 29.6998 13.4487H16.2871V18.6442H24.1601C24.0014 19.9354 23.1442 21.8798 21.2394 23.1864L21.2127 23.3604L25.4536 26.58L25.7474 26.6087C28.4458 24.1665 30.0014 20.5731 30.0014 16.3109Z" fill="#4285F4"/>
+                <path d="M16.2862 30C20.1433 30 23.3814 28.7555 25.7465 26.6089L21.2386 23.1865C20.0322 24.011 18.4132 24.5866 16.2862 24.5866C12.5085 24.5866 9.30219 22.1444 8.15923 18.7688L7.9917 18.7827L3.58202 22.1272L3.52435 22.2843C5.87353 26.8577 10.6989 30 16.2862 30Z" fill="#34A853"/>
+                <path d="M8.16007 18.7688C7.85848 17.8977 7.68395 16.9643 7.68395 15.9999C7.68395 15.0354 7.85849 14.1021 8.1442 13.231L8.13621 13.0455L3.67126 9.64734L3.52518 9.71544C2.55696 11.6132 2.0014 13.7444 2.0014 15.9999C2.0014 18.2555 2.55696 20.3865 3.52518 22.2843L8.16007 18.7688Z" fill="#FBBC05"/>
+                <path d="M16.2863 7.4133C18.9688 7.4133 20.7783 8.54885 21.8101 9.4978L25.8418 5.64C23.3657 3.38445 20.1434 2 16.2863 2C10.699 2 5.87354 5.1422 3.52435 9.71549L8.14339 13.2311C9.30223 9.85555 12.5086 7.4133 16.2863 7.4133Z" fill="#EB4335"/>
+            </svg>
+            <p style={{color: colors.grey[100]}}>{text}</p>
+        </div>
     );
 }
 
@@ -53,8 +55,46 @@ const Signin = () => {
     const { theme, colorMode } = useContext(ColorModeContext)
     const colors = tokens(theme.palette.mode)
 
+    //google init and functions 
+    // function handleCallbackResponse(response){
+    //     console.log("Encoded JWT ID token: ", response.credential);
+    //     let userObj = jwtDecode(response.credential)
+    //     console.log(userObj)
+    // }
+
+    // useEffect(()=>{
+    // google.accounts.id.initialize({
+    //     client_id: '1073441624808-rpbrrr36bnn41jn5hlv4iirgjs7t17tv.apps.googleusercontent.com',
+    //     callback: handleCallbackResponse 
+    // })
+
+    // google.accounts.id.renderButton(
+    //     document.getElementById('googleButton'),
+    //     {theme: "outline", size: "large"}
+    // )
+
+    // google.accounts.id.prompt() 
+    // },[])
+
+    const googleSignIn = useGoogleLogin({
+        onSuccess: async tokenResponse => {
+            try{
+                const data = await axios.get("https://www.googleapis.com/outh2/v3/userinfo", {
+                    headers: {
+                        "Authorization": `Bearer ${tokenResponse.access_token}`
+                    }
+                })
+                console.log(data)
+            }catch(err){
+                console.log(err)
+            }
+        },
+    });
+      
     const [passwordShow, setPasswordShow] = useState(false)
+    const [regPasswordShow, setRegPasswordShow] = useState(false)
     const location = useLocation()
+
     const togglePasswordShow = () => {
         const passwordfield = document.querySelector('#signin_password');
 
@@ -71,10 +111,10 @@ const Signin = () => {
 
         if(passwordfield.getAttribute('type') === 'password'){
             passwordfield.setAttribute('type', 'text');
-            setPasswordShow(true)
+            setRegPasswordShow(true)
         }else{
             passwordfield.setAttribute('type', 'password');
-            setPasswordShow(false)
+            setRegPasswordShow(false)
         }
     }
 
@@ -108,11 +148,13 @@ const Signin = () => {
     const [ signInValues, setSignInValues] = useState(signInInitialValues)
     const [ signInErrors, setSignInErrors] = useState({})
     const [ signInIsSubmit, setSignInIsSubmit] = useState(false)
+    const [ isSigningIn, setIsSigningIn] = useState(false)
 
     useEffect(()=>{
         console.log(signInErrors);
         if(Object.keys(signInErrors).length === 0 && signInIsSubmit){
-            console.log(signInValues)
+            setIsSigningIn(true)
+            SignInAndNavigate()
         }
     },[signInErrors])
 
@@ -130,11 +172,11 @@ const Signin = () => {
         }
     }
 
-    const handleSigninSubmit = (e) => {
+    const handleSigninSubmit = async(e) => {
         console.log('submit')
+        setSignInIsSubmit(true)
         e.preventDefault()
         setSignInErrors(validateSignIn(signInValues))
-        setSignInIsSubmit(true)
     }
 
     const validateSignIn = (signInValues) => {
@@ -148,14 +190,20 @@ const Signin = () => {
 
         if(!signInValues.password){
             errors.password = "Password is required"
-        }else if(signInValues.password < 5){
+        }else if(signInValues.password.length < 5){
             errors.password = "Password must contain 5 characters or more"
-        }else if(signInValues.password > 15){
+        }else if(signInValues.password.length > 15){
             errors.password = "Password must not contain more than 15 characters"
         }else if(!passwordRegex.test(signInValues.password)){
             errors.password = "1 upper case letter, 1 lower case letter, 1 numeric digit"
         }
         return errors;
+    }
+
+    const SignInAndNavigate = async () => {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        console.log(signInValues)
+        setIsSigningIn(false)
     }
 
     //handle registration validation using formik
@@ -198,7 +246,7 @@ const Signin = () => {
 
     return (
         <div className='main_cover' style={{ backgroundColor: theme.palette.background.default }}>
-            
+            {/* <div id='googleButton'></div> */}
             {/* login block */}
             <div className='outer_container login_block'  style={{ 
                 backgroundColor: theme.palette.background.default, 
@@ -211,7 +259,7 @@ const Signin = () => {
 
                     <form onSubmit={handleSigninSubmit} className='login_form form_container'>
                         <h2 className='header' style={{ color: theme.palette.secondary.main}}>My Forms</h2>
-                        <GoogleBtn text={'Sign In with Google'} />
+                        <GoogleBtn text={'Sign In with Google'} onClickAction={googleSignIn} />
                         <div className="or">
                             <div style={{ backgroundColor: colors.grey[300]}}></div>
                             <p>or</p>
@@ -286,7 +334,7 @@ const Signin = () => {
                             <p className="forgot_password">Forgot password?</p>
                             </div>
                         </div>
-                        <Btn text='Sign In' />
+                        <Btn text='Sign In' isSubmitting={isSigningIn} />
                         <div className="form_field_lastpart">
                             <p>Don't have an account? <Link style={{color: theme.palette.secondary.main}} to='/signup'>Sign up for free</Link></p>
                         </div>
@@ -307,7 +355,7 @@ const Signin = () => {
                     {/* resgister form */}
                     <form onSubmit={handleSubmit} className='resgister_form form_container'>
                     <h2 className='header' style={{ color: theme.palette.secondary.main}}>My Forms</h2>
-                    <GoogleBtn text={'Sign Up with Google'}/>
+                    <GoogleBtn text={'Sign Up with Google'} onClickAction={googleSignIn}/>
                     <div className="or">
                         <div style={{ backgroundColor: colors.grey[300]}}></div>
                         <p>or</p>
@@ -375,7 +423,7 @@ const Signin = () => {
                             />
                             {errors.regPassword && touched.regPassword && <p className='form_error_text'>{errors.regPassword}</p>}
                             {
-                            !passwordShow ? 
+                            !regPasswordShow ? 
                             <svg onClick={togglePasswordShowTwo} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path fill-rule="evenodd" clip-rule="evenodd" d="M15.1614 12.0531C15.1614 13.7991 13.7454 15.2141 11.9994 15.2141C10.2534 15.2141 8.83838 13.7991 8.83838 12.0531C8.83838 10.3061 10.2534 8.89111 11.9994 8.89111C13.7454 8.89111 15.1614 10.3061 15.1614 12.0531Z" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                 <path fill-rule="evenodd" clip-rule="evenodd" d="M11.998 19.3549C15.806 19.3549 19.289 16.6169 21.25 12.0529C19.289 7.48892 15.806 4.75092 11.998 4.75092H12.002C8.194 4.75092 4.711 7.48892 2.75 12.0529C4.711 16.6169 8.194 19.3549 12.002 19.3549H11.998Z" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
