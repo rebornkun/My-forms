@@ -76,6 +76,7 @@
     margin-bottom: 1rem;
 }
 
+
 /* login form style */
 .login_block{
     z-index: 1;
@@ -303,4 +304,19 @@ label{
 .terms_conditions a:hover{
     transform: scale(1.02);
     transition: all 0.5s ease;
+}
+
+/* error style */
+.input-error{
+    border-bottom: 1px solid #af3f3b;
+}
+.form_error_text{
+    font-size: 12px;
+    margin-top: -0.2rem;
+    color: #af3f3b;
+    font-weight: 800;
+}
+
+button:disabled{
+    opacity: 0.35;
 }

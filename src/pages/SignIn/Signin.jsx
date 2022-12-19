@@ -1,6 +1,6 @@
 import './Signin.css'
 import { ColorModeContext, tokens } from "../../theme";
-import { useContext, useEffect, useState } from 'react';
+import { Component, useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import * as yup from 'yup';
 import { Formik, useFormik } from 'formik';
@@ -26,18 +26,26 @@ const GoogleBtn = ({text}) => {
         </Link>
     );
 }
-const Btn = ({name, text}) => {
+
+// submit button Component
+const Btn = ({name, text, isSubmitting}) => {
 
     const { theme, colorMode } = useContext(ColorModeContext)
     const colors = tokens(theme.palette.mode)
     
     return (
-        <Link className='text-link' to={name} >
-            <button type='submit' className='btn' style={{ 
-                backgroundColor: colors.greenAccent[600]}} >
+        <button type='submit' disabled={isSubmitting} className='btn' style={{ 
+            backgroundColor: colors.greenAccent[600]}} >
+                {isSubmitting ? 
+                <i class="fa fa-spinner fa-spin" aria-hidden="true"
+                style={{
+                    fontSize: '1.5rem',
+                    color: colors.blueAccent[900]
+                }}></i> 
+                :
                 <p style={{color: colors.grey[100]}}>{text}</p>
-            </button>
-        </Link>
+                }
+        </button>
     );
 }
 
@@ -86,18 +94,94 @@ const Signin = () => {
 
     }
 
-    //handle signin
+    //regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,4}$/i
+    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{5,}$/;
+    //min 5 characters, 1 upper case letter, 1 lower case letter, 1 numeric digit
+
+    //handle signin validation using states
     const signInInitialValues = {
         email: "",
-        password: ""
+        password: "",
+        rememberMe: false,
     }
-    const handleSignInSubmit = (values) => {
-        console.log(values)
+    const [ signInValues, setSignInValues] = useState(signInInitialValues)
+    const [ signInErrors, setSignInErrors] = useState({})
+    const [ signInIsSubmit, setSignInIsSubmit] = useState(false)
+
+    useEffect(()=>{
+        console.log(signInErrors);
+        if(Object.keys(signInErrors).length === 0 && signInIsSubmit){
+            console.log(signInValues)
+        }
+    },[signInErrors])
+
+    const handleSigninChange = (e) => {
+        const { name, value } = e.target
+
+        if(name === 'rememberMe'){
+            if(e.target.checked === true){
+                setSignInValues({ ...signInValues, [name]: true })
+            }else{
+                setSignInValues({ ...signInValues, [name]: false })
+            }
+        }else{
+            setSignInValues({ ...signInValues, [name]: value })
+        }
     }
 
-    //handle registration
-    
-    const { values, handleBlur, handleChange } = useFormik({
+    const handleSigninSubmit = (e) => {
+        console.log('submit')
+        e.preventDefault()
+        setSignInErrors(validateSignIn(signInValues))
+        setSignInIsSubmit(true)
+    }
+
+    const validateSignIn = (signInValues) => {
+        const errors = {};
+        
+        if(!signInValues.email){
+            errors.email = "Email is required"
+        }else if(!emailRegex.test(signInValues.email)){
+            errors.email = "This is not a valid email format"
+        }
+
+        if(!signInValues.password){
+            errors.password = "Password is required"
+        }else if(signInValues.password < 5){
+            errors.password = "Password must contain 5 characters or more"
+        }else if(signInValues.password > 15){
+            errors.password = "Password must not contain more than 15 characters"
+        }else if(!passwordRegex.test(signInValues.password)){
+            errors.password = "1 upper case letter, 1 lower case letter, 1 numeric digit"
+        }
+        return errors;
+    }
+
+    //handle registration validation using formik
+    const registerSchema = yup.object().shape({
+        regEmail: yup.string().email("please enter a valid email").required("required"),
+        confirmEmail: yup.string().oneOf([yup.ref('regEmail')], "Emails do not match").required("required"),
+        regPassword: yup
+        .string()
+        .min(5,"Password must be more than 5 characters")
+        .max(15,"Password must not be more than 15 characters")
+        .matches(passwordRegex, { message: "1 upper case letter, 1 lower case letter, 1 numeric digit" })
+        .required("required"),
+        userName: yup.string().required("required"),
+        dateOfBirth: yup.string().required("required"),
+        gender: yup.string().required("required")
+    })
+
+    const onSubmit = async (values, actions) => {
+        console.log('submitted')
+        console.log(values)
+        console.log(actions)
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        actions.resetForm()
+    }
+
+    const { values, handleBlur, handleChange, handleSubmit, errors, touched, isSubmitting } = useFormik({
         initialValues: {
             regEmail: "",
             confirmEmail: "",
@@ -105,22 +189,12 @@ const Signin = () => {
             userName: "",
             dateOfBirth: "",
             gender: ""
-        }
-    })
-    
-    const handleRegisterSubmit = (values) => {
-        console.log(values)
-    }
-    const registerSchema = yup.object().shape({
-        email: yup.string().email("invalid email").required("required"),
-        confirmEmail: yup.string().email("invalid email").required("required"),
-        password: yup.string().required("required"),
-        userName: yup.string().required("required"),
-        dateOfBirth: yup.string().required("required"),
-        gender: yup.string().required("required")
+        },
+        validationSchema: registerSchema,
+        onSubmit: onSubmit,
     })
 
-    console.log(values)
+    
 
     return (
         <div className='main_cover' style={{ backgroundColor: theme.palette.background.default }}>
@@ -135,12 +209,7 @@ const Signin = () => {
 
                     {/* login form */}
 
-                    <Formik
-                    onSubmit={handleSignInSubmit}
-                    initialValues={signInInitialValues}>
-
-                    </Formik>
-                    <div className='login_form form_container'>
+                    <form onSubmit={handleSigninSubmit} className='login_form form_container'>
                         <h2 className='header' style={{ color: theme.palette.secondary.main}}>My Forms</h2>
                         <GoogleBtn text={'Sign In with Google'} />
                         <div className="or">
@@ -150,33 +219,41 @@ const Signin = () => {
                         </div>
 
                         <div className="inputs">
+
                             <div className="emailfield inputfield">
                                 <label htmlFor="Email"
                                     style={{color: theme.palette.secondary.main}}>Email</label>
                                 <input 
                                 type='email'
                                 id="Email"
-                                name="Email"
+                                name="email"
                                 placeholder="e.g abc@gmail.com"
                                 autoComplete="email"
+                                value={signInValues.email}
+                                onChange={handleSigninChange}
                                 style={{
-                                    borderBottom: `1px solid ${colors.grey[300]}`
+                                    borderBottom: errors.regEmail && touched.regEmail ? `1px solid ${colors.redAccent[600]}`: `1px solid ${colors.grey[300]}`
                                 }}
                                 />
+                                {signInErrors.email && <p className='form_error_text'>{signInErrors.email}</p>}
                             </div>
+
                             <div className="passwordfield inputfield">
                                 <label htmlFor="Password"
                                 style={{color: theme.palette.secondary.main}}>Password</label>
                                 <input 
                                 id="signin_password"
-                                name="Password"
+                                name="password"
                                 type='password'
                                 autocomplete="current-password"
                                 autoCorrect={false}
+                                value={signInValues.password}
+                                onChange={handleSigninChange}
                                 style={{
                                     borderBottom: `1px solid ${colors.grey[300]}`
                                 }}
                                 />
+                                {signInErrors.password && <p className='form_error_text'>{signInErrors.password}</p>}
                                 {
                                 !passwordShow ? 
                                 <svg onClick={togglePasswordShow} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -194,10 +271,15 @@ const Signin = () => {
                                 }
 
                             </div>
+
                             <div className="remeber_forget">
                             <div className="remeberme_check">
                                 <input
                                 type='checkbox'
+                                name='rememberMe'
+                                // checked={signInValues.rememberMe === true}
+                                value={signInValues.rememberMe}
+                                onChange={handleSigninChange}
                                 />
                                 <p>Remeber me for 30 days</p>
                             </div>
@@ -208,7 +290,7 @@ const Signin = () => {
                         <div className="form_field_lastpart">
                             <p>Don't have an account? <Link style={{color: theme.palette.secondary.main}} to='/signup'>Sign up for free</Link></p>
                         </div>
-                    </div>
+                    </form>
 
 
                 </div>
@@ -223,7 +305,7 @@ const Signin = () => {
                 boxShadow: `0px 0px 10px 1px ${colors.grey[800]}`}}>
 
                     {/* resgister form */}
-                    <form className='resgister_form form_container'>
+                    <form onSubmit={handleSubmit} className='resgister_form form_container'>
                     <h2 className='header' style={{ color: theme.palette.secondary.main}}>My Forms</h2>
                     <GoogleBtn text={'Sign Up with Google'}/>
                     <div className="or">
@@ -233,6 +315,7 @@ const Signin = () => {
                     </div>
 
                     <div className="inputs">
+
                         <div className="email_field inputfield">
                             <label htmlFor="regEmail"
                                 style={{color: theme.palette.secondary.main}}>Email</label>
@@ -245,13 +328,16 @@ const Signin = () => {
                             value={values.regEmail}
                             onChange={handleChange}
                             onBlur={handleBlur}
+                            className={errors.regEmail && touched.regEmail ? "input-error" : undefined}
                             // error={!!touched.email}
                             // helperText={touched.email && errors.email}
                             style={{
-                                borderBottom: `1px solid ${colors.grey[300]}`
+                                borderBottom: errors.regEmail && touched.regEmail ? `1px solid ${colors.redAccent[600]}`: `1px solid ${colors.grey[300]}`
                             }}
                             />
+                            {errors.regEmail && touched.regEmail && <p className='form_error_text'>{errors.regEmail}</p>}
                         </div>
+
                         <div className="confirm_email_field inputfield">
                             <label htmlFor="confirmEmail"
                                 style={{color: theme.palette.secondary.main}}>Confirm Email</label>
@@ -265,10 +351,12 @@ const Signin = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             style={{
-                                borderBottom: `1px solid ${colors.grey[300]}`
+                                borderBottom: errors.confirmEmail && touched.confirmEmail ? `1px solid ${colors.redAccent[600]}`: `1px solid ${colors.grey[300]}`
                             }}
                             />
+                            {errors.confirmEmail && touched.confirmEmail && <p className='form_error_text'>{errors.confirmEmail}</p>}
                         </div>
+
                         <div className="passwordfield inputfield">
                             <label htmlFor="regPassword"
                             style={{color: theme.palette.secondary.main}}>Password</label>
@@ -282,9 +370,10 @@ const Signin = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             style={{
-                                borderBottom: `1px solid ${colors.grey[300]}`
+                                borderBottom: errors.regPassword && touched.regPassword ? `1px solid ${colors.redAccent[600]}`: `1px solid ${colors.grey[300]}`
                             }}
                             />
+                            {errors.regPassword && touched.regPassword && <p className='form_error_text'>{errors.regPassword}</p>}
                             {
                             !passwordShow ? 
                             <svg onClick={togglePasswordShowTwo} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -300,8 +389,8 @@ const Signin = () => {
                                 <path d="M19.8868 4.24957L4.11279 20.0236" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                             }
-
                         </div>
+
                         <div className="user_name inputfield">
                             <label htmlFor="userName"
                                 style={{color: theme.palette.secondary.main}}>What should we call you?</label>
@@ -310,16 +399,18 @@ const Signin = () => {
                             id="userName"
                             name="userName"
                             placeholder="e.g dey_play4"
-                            autoComplete={false}
-                            autoCorrect={false}
+                            autoComplete='off'
+                            autoCorrect='off'
                             value={values.userName}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             style={{
-                                borderBottom: `1px solid ${colors.grey[300]}`
+                                borderBottom: errors.userName && touched.userName ? `1px solid ${colors.redAccent[600]}`: `1px solid ${colors.grey[300]}`
                             }}
                             />
+                            {errors.userName && touched.userName && <p className='form_error_text'>{errors.userName}</p>}
                         </div>
+
                         <div className="d_o_b inputfield">
                             <label htmlFor="dateOfBirth" 
                             style={{color: theme.palette.secondary.main}}>What's your date of birth?</label>
@@ -331,9 +422,11 @@ const Signin = () => {
                             value={values.dateOfBirth}
                             onChange={handleChange}
                             onBlur={handleBlur}
-                            style={{color: colors.redAccent[500]}}
+                            style={{color: colors.greenAccent[300]}}
                             />
+                            {errors.dateOfBirth && touched.dateOfBirth && <p className='form_error_text'>{errors.dateOfBirth}</p>}
                         </div>
+
                         <div className="gender inputfield">
                             <label style={{color: theme.palette.secondary.main}}>
                                 <input
@@ -341,8 +434,8 @@ const Signin = () => {
                                 value="Male"
                                 name="gender"
                                 className="gender_radio"
-                                // checked={this.state.selectedOption === "Male"}
-                                // onChange={this.onValueChange}
+                                checked={values.gender === "Male"}
+                                onChange={handleChange}
                                 />
                                 Male
                             </label>
@@ -352,8 +445,8 @@ const Signin = () => {
                                 value="Female"
                                 name="gender"
                                 className="gender_radio"
-                                // checked={this.state.selectedOption === "Female"}
-                                // onChange={this.onValueChange}
+                                checked={values.gender === "Female"}
+                                onChange={handleChange}
                                 />
                                 Female
                             </label>
@@ -363,18 +456,21 @@ const Signin = () => {
                                 value="Prefer Not to say"
                                 name="gender"
                                 className="gender_radio"
-                                // checked={this.state.selectedOption === "Prefer Not to say"}
-                                // onChange={this.onValueChange}
+                                checked={values.gender === "Prefer Not to say"}
+                                onChange={handleChange}
                                 />
                                 Prefer Not to say
                             </label>
                         </div>
+                            {errors.gender && touched.gender && <p className='form_error_text'>{errors.gender}</p>}
+
                         <div className="terms_conditions">
                             <p style={{color: colors.redAccent[300]}}>By clicking on sign-up, you agree to the Musica <a>Terms and Conditions</a> and <a>Privacy Policy</a>.</p>
                         </div>
+
                     </div>
-                    <button type='submit'></button>
-                    <Btn type='submit' text='Sign Up' />
+                    {/* <button type='submit'></button> */}
+                    <Btn text='Sign Up' isSubmitting={isSubmitting} />
                     
                     <div className="form_field_lastpart">
                         <p>Already have an account? <Link style={{color: theme.palette.secondary.main}} to='/signin'>Sign in now!</Link></p>
