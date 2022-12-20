@@ -5,7 +5,7 @@ import { Link, useLocation } from 'react-router-dom';
 import * as yup from 'yup';
 import { Formik, useFormik } from 'formik';
 import jwtDecode from 'jwt-decode';
-import { useGoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin, GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 
 const GoogleBtn = ({text, onClickAction}) => {
@@ -79,12 +79,26 @@ const Signin = () => {
     const googleSignIn = useGoogleLogin({
         onSuccess: async tokenResponse => {
             try{
-                const data = await axios.get("https://www.googleapis.com/outh2/v3/userinfo", {
+                const res = await axios.get("https://www.googleapis.com/outh2/v3/userinfo", {
+                    mode: 'no-cors',
                     headers: {
-                        "Authorization": `Bearer ${tokenResponse.access_token}`
-                    }
+                        'content-type': 'application/x-www-form-urlencoded',
+                        "Authorization": `Bearer ${tokenResponse.access_token}`,
+                        'Access-Control-Allow-Origin': '*',
+                    },
+                    // withCredentials: true,
+                    crossDomain:true,                
+                    withCredentials: false
                 })
-                console.log(data)
+                // const res = fetch("https://www.googleapis.com/outh2/v3/userinfo", {
+                //     method: "GET",
+                //     mode: 'no-cors',
+                //     headers: {
+                //         "Authorization": `Bearer ${tokenResponse.access_token}`,
+                //         "Access-Control-Allow-Origin": "*",
+                //     },
+                // })
+                console.log(res)
             }catch(err){
                 console.log(err)
             }
