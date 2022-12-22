@@ -15,7 +15,7 @@ const GoogleBtn = ({ id, text, onClickAction, isSubmitting}) => {
     const colors = tokens(theme.palette.mode)
     
     return (
-        <button id={`googleButton${id}`} className='btn' disabled={isSubmitting} onClick={onClickAction} style={{ 
+        <button id={`googleButton${id}`} type='button' className='btn' disabled={isSubmitting} onClick={onClickAction} style={{ 
             backgroundColor: theme.palette.neutral.dark,
             fontFamily: `'Quicksand', sans-serif`}} >
                 {isSubmitting ? 
