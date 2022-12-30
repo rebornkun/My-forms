@@ -200,20 +200,6 @@ const Signin = () => {
 
     //handle registration validation using formik
 
-    // const registerSchema = yup.object().shape({
-    //     regEmail: yup.string().email("please enter a valid email").required("required"),
-    //     confirmEmail: yup.string().oneOf([yup.ref('regEmail')], "Emails do not match").required("required"),
-    //     regPassword: yup
-    //     .string()
-    //     .min(5,"Password must be more than 5 characters")
-    //     .max(15,"Password must not be more than 15 characters")
-    //     .matches(passwordRegex, { message: "1 upper case letter, 1 lower case letter, 1 numeric digit" })
-    //     .required("required"),
-    //     userName: yup.string().required("required"),
-    //     dateOfBirth: yup.string().required("required"),
-    //     gender: yup.string().required("required")
-    // })
-
     const onSubmit = async (values, actions) => {
         console.log('submitted')
         console.log(values)
@@ -231,13 +217,13 @@ const Signin = () => {
             dateOfBirth: "",
             gender: ""
         },
-        validationSchema: registerSchema,
+        validationSchema: registerSchema, //imported from schema js,,,, validated with yup
         onSubmit: onSubmit,
     })
 
     return (
         <div className='main_cover' style={{ backgroundColor: theme.palette.background.default }}>
-            {/* <div id='googleButton'></div> */}
+            
             {/* login block */}
             <div className='outer_container login_block'  style={{ 
                 backgroundColor: theme.palette.background.default, 
@@ -344,6 +330,7 @@ const Signin = () => {
                 boxShadow: `0px 0px 10px 1px ${colors.grey[800]}`}}>
 
                     {/* resgister form */}
+                    
                     <form onSubmit={handleSubmit} className='resgister_form form_container'>
                     <h2 className='header' style={{ color: theme.palette.secondary.main}}>My Forms</h2>
                     <GoogleBtn id={'Register'} text={'Sign Up with Google'} onClickAction={googleSignIn}/>
