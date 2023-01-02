@@ -10,7 +10,6 @@ import myFormsDataService from '../../services/myforms'
 import { registerSchema } from '../../schema';
 
 const GoogleBtn = ({ id, text, onClickAction, isSubmitting}) => {
-
     const { theme, colorMode } = useContext(ColorModeContext)
     const colors = tokens(theme.palette.mode)
     
@@ -70,6 +69,8 @@ const Signin = () => {
     const [ isSigningInWithGoogle, setIsSigningInWithGoogle] = useState(false) //for google btn loading
     const [passwordShow, setPasswordShow] = useState(false) //password show or not
     const [regPasswordShow, setRegPasswordShow] = useState(false)
+    const [googleSignType, setGoogleSignType] = useState('')
+    
 
     useEffect(()=>{
         //checkRouteForSwap
@@ -89,21 +90,22 @@ const Signin = () => {
 
     //goole signin function
     const googleSignIn = useGoogleLogin({
-        onSuccess: async tokenResponse => {
-            try{
-                setIsSigningInWithGoogle(true)
-                let res = await myFormsDataService.authGoogleUser(tokenResponse.access_token)
-                console.log('worked')
-                setIsSigningInWithGoogle(false)
-                navigate(`/home/${res.data}`, {state: { }})
-            }catch(err){
-                setIsSigningInWithGoogle(false)
-                console.log(err)
-            }
-            
-        },
-    });
-    
+            onSuccess: async tokenResponse => {
+                try{
+                    setIsSigningInWithGoogle(true)
+                    let res = await myFormsDataService.authGoogleUser(tokenResponse.access_token)
+                    console.log('worked')
+                    console.log(googleSignType)
+                    setIsSigningInWithGoogle(false)
+                    navigate(`/home`, {state: { }})
+                }catch(err){
+                    setIsSigningInWithGoogle(false)
+                    console.log(err)
+                }
+                
+            },
+        });
+
     //handle password toogles
     const togglePasswordShow = () => {
 
@@ -193,7 +195,9 @@ const Signin = () => {
     }
 
     const SignInAndNavigate = async () => {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => {
+            setTimeout(navigate(`/home`, {state: { }}), 10000)
+        });
         console.log(signInValues)
         setIsSigningIn(false)
     }
@@ -236,7 +240,7 @@ const Signin = () => {
 
                     <form onSubmit={handleSigninSubmit} className='login_form form_container'>
                         <h2 className='header' style={{ color: theme.palette.secondary.main}}>My Forms</h2>
-                        <GoogleBtn id={'SignIn'} text={'Sign In with Google'} onClickAction={googleSignIn} isSubmitting={isSigningInWithGoogle} />
+                        <GoogleBtn id={'SignIn'} text={'Sign In with Google'} onClickAction={googleSignIn} isSubmitting={isSigningInWithGoogle}/>
                         <div className="or">
                             <div style={{ backgroundColor: colors.grey[300]}}></div>
                             <p>or</p>
@@ -257,6 +261,7 @@ const Signin = () => {
                                 value={signInValues.email}
                                 onChange={handleSigninChange}
                                 style={{
+                                    color: colors.grey[100],
                                     borderBottom: errors.regEmail && touched.regEmail ? `1px solid ${colors.redAccent[600]}`: `1px solid ${colors.grey[300]}`
                                 }}
                                 />
@@ -275,6 +280,7 @@ const Signin = () => {
                                 value={signInValues.password}
                                 onChange={handleSigninChange}
                                 style={{
+                                    color: colors.grey[100],
                                     borderBottom: `1px solid ${colors.grey[300]}`
                                 }}
                                 />
@@ -282,16 +288,16 @@ const Signin = () => {
                                 {
                                 !passwordShow ? 
                                 <svg onClick={togglePasswordShow} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.1614 12.0531C15.1614 13.7991 13.7454 15.2141 11.9994 15.2141C10.2534 15.2141 8.83838 13.7991 8.83838 12.0531C8.83838 10.3061 10.2534 8.89111 11.9994 8.89111C13.7454 8.89111 15.1614 10.3061 15.1614 12.0531Z" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M11.998 19.3549C15.806 19.3549 19.289 16.6169 21.25 12.0529C19.289 7.48892 15.806 4.75092 11.998 4.75092H12.002C8.194 4.75092 4.711 7.48892 2.75 12.0529C4.711 16.6169 8.194 19.3549 12.002 19.3549H11.998Z" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.1614 12.0531C15.1614 13.7991 13.7454 15.2141 11.9994 15.2141C10.2534 15.2141 8.83838 13.7991 8.83838 12.0531C8.83838 10.3061 10.2534 8.89111 11.9994 8.89111C13.7454 8.89111 15.1614 10.3061 15.1614 12.0531Z" style={{ stroke: colors.grey[300], transition: `all 0.3s ease` }} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M11.998 19.3549C15.806 19.3549 19.289 16.6169 21.25 12.0529C19.289 7.48892 15.806 4.75092 11.998 4.75092H12.002C8.194 4.75092 4.711 7.48892 2.75 12.0529C4.711 16.6169 8.194 19.3549 12.002 19.3549H11.998Z" style={{ stroke: colors.grey[300], transition: `all 0.3s ease` }} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                                 :
                                 <svg onClick={togglePasswordShow} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9.76057 14.3668C9.18557 13.7928 8.83557 13.0128 8.83557 12.1378C8.83557 10.3848 10.2476 8.9718 11.9996 8.9718C12.8666 8.9718 13.6646 9.3228 14.2296 9.8968" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M15.1047 12.6989C14.8727 13.9889 13.8567 15.0069 12.5677 15.2409" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M6.65451 17.4723C5.06751 16.2263 3.72351 14.4063 2.74951 12.1373C3.73351 9.85829 5.08651 8.02829 6.68351 6.77229C8.27051 5.51629 10.1015 4.83429 11.9995 4.83429C13.9085 4.83429 15.7385 5.52629 17.3355 6.79129" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M19.4475 8.99078C20.1355 9.90478 20.7405 10.9598 21.2495 12.1368C19.2825 16.6938 15.8065 19.4388 11.9995 19.4388C11.1365 19.4388 10.2855 19.2988 9.46753 19.0258" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                    <path d="M19.8868 4.24957L4.11279 20.0236" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M9.76057 14.3668C9.18557 13.7928 8.83557 13.0128 8.83557 12.1378C8.83557 10.3848 10.2476 8.9718 11.9996 8.9718C12.8666 8.9718 13.6646 9.3228 14.2296 9.8968" style={{ stroke: colors.grey[300], transition: `all 0.3s ease` }} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M15.1047 12.6989C14.8727 13.9889 13.8567 15.0069 12.5677 15.2409" style={{ stroke: colors.grey[300], transition: `all 0.3s ease` }} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M6.65451 17.4723C5.06751 16.2263 3.72351 14.4063 2.74951 12.1373C3.73351 9.85829 5.08651 8.02829 6.68351 6.77229C8.27051 5.51629 10.1015 4.83429 11.9995 4.83429C13.9085 4.83429 15.7385 5.52629 17.3355 6.79129" style={{ stroke: colors.grey[300], transition: `all 0.3s ease` }} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M19.4475 8.99078C20.1355 9.90478 20.7405 10.9598 21.2495 12.1368C19.2825 16.6938 15.8065 19.4388 11.9995 19.4388C11.1365 19.4388 10.2855 19.2988 9.46753 19.0258" style={{ stroke: colors.grey[300], transition: `all 0.3s ease` }} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M19.8868 4.24957L4.11279 20.0236" style={{ stroke: colors.grey[300], transition: `all 0.3s ease` }} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                                 }
 
@@ -306,14 +312,14 @@ const Signin = () => {
                                 value={signInValues.rememberMe}
                                 onChange={handleSigninChange}
                                 />
-                                <p>Remeber me for 30 days</p>
+                                <p style={{ color: colors.blueAccent[500]}}>Remeber me for 30 days</p>
                             </div>
-                            <p className="forgot_password">Forgot password?</p>
+                            <p className="forgot_password" style={{ color: colors.redAccent[500]}}>Forgot password?</p>
                             </div>
                         </div>
                         <Btn text='Sign In' isSubmitting={isSigningIn} />
                         <div className="form_field_lastpart">
-                            <p>Don't have an account? <Link style={{color: theme.palette.secondary.main}} to='/signup'>Sign up for free</Link></p>
+                            <p style={{ color: colors.blueAccent[500]}}>Don't have an account? <Link style={{color: theme.palette.secondary.main}} to='/signup'>Sign up for free</Link></p>
                         </div>
                     </form>
 
@@ -358,6 +364,7 @@ const Signin = () => {
                             // error={!!touched.email}
                             // helperText={touched.email && errors.email}
                             style={{
+                                color: colors.grey[100],
                                 borderBottom: errors.regEmail && touched.regEmail ? `1px solid ${colors.redAccent[600]}`: `1px solid ${colors.grey[300]}`
                             }}
                             />
@@ -377,6 +384,7 @@ const Signin = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             style={{
+                                color: colors.grey[100],
                                 borderBottom: errors.confirmEmail && touched.confirmEmail ? `1px solid ${colors.redAccent[600]}`: `1px solid ${colors.grey[300]}`
                             }}
                             />
@@ -396,6 +404,7 @@ const Signin = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             style={{
+                                color: colors.grey[100],
                                 borderBottom: errors.regPassword && touched.regPassword ? `1px solid ${colors.redAccent[600]}`: `1px solid ${colors.grey[300]}`
                             }}
                             />
@@ -403,16 +412,16 @@ const Signin = () => {
                             {
                             !regPasswordShow ? 
                             <svg onClick={togglePasswordShowTwo} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M15.1614 12.0531C15.1614 13.7991 13.7454 15.2141 11.9994 15.2141C10.2534 15.2141 8.83838 13.7991 8.83838 12.0531C8.83838 10.3061 10.2534 8.89111 11.9994 8.89111C13.7454 8.89111 15.1614 10.3061 15.1614 12.0531Z" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.998 19.3549C15.806 19.3549 19.289 16.6169 21.25 12.0529C19.289 7.48892 15.806 4.75092 11.998 4.75092H12.002C8.194 4.75092 4.711 7.48892 2.75 12.0529C4.711 16.6169 8.194 19.3549 12.002 19.3549H11.998Z" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M15.1614 12.0531C15.1614 13.7991 13.7454 15.2141 11.9994 15.2141C10.2534 15.2141 8.83838 13.7991 8.83838 12.0531C8.83838 10.3061 10.2534 8.89111 11.9994 8.89111C13.7454 8.89111 15.1614 10.3061 15.1614 12.0531Z" style={{ stroke: colors.grey[300], transition: `all 0.3s ease` }} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.998 19.3549C15.806 19.3549 19.289 16.6169 21.25 12.0529C19.289 7.48892 15.806 4.75092 11.998 4.75092H12.002C8.194 4.75092 4.711 7.48892 2.75 12.0529C4.711 16.6169 8.194 19.3549 12.002 19.3549H11.998Z" style={{ stroke: colors.grey[300], transition: `all 0.3s ease` }} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                             :
                             <svg onClick={togglePasswordShowTwo} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9.76057 14.3668C9.18557 13.7928 8.83557 13.0128 8.83557 12.1378C8.83557 10.3848 10.2476 8.9718 11.9996 8.9718C12.8666 8.9718 13.6646 9.3228 14.2296 9.8968" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M15.1047 12.6989C14.8727 13.9889 13.8567 15.0069 12.5677 15.2409" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M6.65451 17.4723C5.06751 16.2263 3.72351 14.4063 2.74951 12.1373C3.73351 9.85829 5.08651 8.02829 6.68351 6.77229C8.27051 5.51629 10.1015 4.83429 11.9995 4.83429C13.9085 4.83429 15.7385 5.52629 17.3355 6.79129" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M19.4475 8.99078C20.1355 9.90478 20.7405 10.9598 21.2495 12.1368C19.2825 16.6938 15.8065 19.4388 11.9995 19.4388C11.1365 19.4388 10.2855 19.2988 9.46753 19.0258" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                <path d="M19.8868 4.24957L4.11279 20.0236" stroke="#130F26" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M9.76057 14.3668C9.18557 13.7928 8.83557 13.0128 8.83557 12.1378C8.83557 10.3848 10.2476 8.9718 11.9996 8.9718C12.8666 8.9718 13.6646 9.3228 14.2296 9.8968" style={{ stroke: colors.grey[300], transition: `all 0.3s ease` }} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M15.1047 12.6989C14.8727 13.9889 13.8567 15.0069 12.5677 15.2409" style={{ stroke: colors.grey[300], transition: `all 0.3s ease` }} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M6.65451 17.4723C5.06751 16.2263 3.72351 14.4063 2.74951 12.1373C3.73351 9.85829 5.08651 8.02829 6.68351 6.77229C8.27051 5.51629 10.1015 4.83429 11.9995 4.83429C13.9085 4.83429 15.7385 5.52629 17.3355 6.79129" style={{ stroke: colors.grey[300], transition: `all 0.3s ease` }} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M19.4475 8.99078C20.1355 9.90478 20.7405 10.9598 21.2495 12.1368C19.2825 16.6938 15.8065 19.4388 11.9995 19.4388C11.1365 19.4388 10.2855 19.2988 9.46753 19.0258" style={{ stroke: colors.grey[300], transition: `all 0.3s ease` }} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M19.8868 4.24957L4.11279 20.0236" style={{ stroke: colors.grey[300], transition: `all 0.3s ease` }} stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                             }
                         </div>
@@ -431,6 +440,7 @@ const Signin = () => {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             style={{
+                                color: colors.grey[100],
                                 borderBottom: errors.userName && touched.userName ? `1px solid ${colors.redAccent[600]}`: `1px solid ${colors.grey[300]}`
                             }}
                             />
@@ -499,7 +509,7 @@ const Signin = () => {
                     <Btn text='Sign Up' isSubmitting={isSubmitting} />
                     
                     <div className="form_field_lastpart">
-                        <p>Already have an account? <Link style={{color: theme.palette.secondary.main}} to='/signin'>Sign in now!</Link></p>
+                        <p style={{ color: colors.blueAccent[500]}}>Already have an account? <Link style={{color: theme.palette.secondary.main}} to='/signin'>Sign in now!</Link></p>
                     </div>
                     </form>
 

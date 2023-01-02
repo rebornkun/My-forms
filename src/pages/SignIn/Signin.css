@@ -148,6 +148,7 @@
     font-weight: 500;
     letter-spacing: 0.5px;
     padding: 0.2rem 0rem;
+    color: azure;
 }
 .inputs input::placeholder{
     color: #727171;
@@ -162,7 +163,7 @@ input:-webkit-autofill:focus,
 input:-webkit-autofill:active{
     /* -webkit-box-shadow: 0 0 0 30px white inset !important; */
     transition: background-color 5000s ease-in-out 0s;
-    /* -webkit-text-fill-color: yellow !important; */
+    -webkit-text-fill-color: rgb(187, 187, 178) !important;
 }
 
 label{
