@@ -29,7 +29,7 @@ const Dashboard = () => {
             <h1 className='header' style={{ color: theme.palette.secondary.main}}>My Forms</h1>
             <NavBtn name='signin' />
             <NavBtn name='newsletter' />
-            <NavBtn name='signin' />
+            <NavBtn name='contact' />
             <NavBtn name='signin' />
         </div>
     );

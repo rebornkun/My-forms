@@ -5,6 +5,7 @@ import Dashboard from '../pages/Dashboard/Dashboard'
 import Signin from '../pages/SignIn/Signin'
 import './App.css'
 import LightDarkBtn from '../components/LightDarkBtn'
+import Newsletter from '../pages/Newsletter/Newsletter'
 
 function App() {
   const [theme , colorMode] = useMode()
@@ -19,6 +20,8 @@ function App() {
           <Route path='/' element={<Dashboard />}/>
           <Route path='/signin' element={<Signin />}/>
           <Route path='/signup' element={<Signin />}/>
+          <Route path='/newsletter' element={<Newsletter />}/>
+          <Route path='/contact' element={<Signin />}/>
         </Routes>
       </div>
     </ColorModeContext.Provider>
