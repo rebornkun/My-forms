@@ -88,6 +88,9 @@ const Signin = () => {
     const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{5,}$/;
     //min 5 characters, 1 upper case letter, 1 lower case letter, 1 numeric digit
 
+    // const key = process.env.REACT_APP_GOOGLE_CLIENT_ID
+    // console.log(key)
+
     //goole signin function
     const googleSignIn = useGoogleLogin({
             onSuccess: async tokenResponse => {
