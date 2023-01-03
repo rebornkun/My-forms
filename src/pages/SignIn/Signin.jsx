@@ -1,6 +1,6 @@
 import './Signin.css'
 import { ColorModeContext, tokens } from "../../theme";
-import { Component, useContext, useEffect, useState } from 'react';
+import { Component, useContext, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Formik, useFormik } from 'formik';
 import jwtDecode from 'jwt-decode';
@@ -72,15 +72,18 @@ const Signin = () => {
     const [googleSignType, setGoogleSignType] = useState('')
     
 
+    const loginBlock = useRef()
+    const registerBlock = useRef()
     useEffect(()=>{
         //checkRouteForSwap
         if(location.pathname === "/signin"){
-            document.querySelector('.login_block').classList.add('active')
-            document.querySelector('.register_block').classList.remove('active')
+            loginBlock.current.classList.add('active')
+            registerBlock.current.classList.remove('active')
         }else if(location.pathname === "/signup"){
-            document.querySelector('.login_block').classList.remove('active')
-            document.querySelector('.register_block').classList.add('active')
+            loginBlock.current.classList.remove('active')
+            registerBlock.current.classList.add('active')
         }
+
     },[location])
 
     //regex
@@ -110,27 +113,26 @@ const Signin = () => {
         });
 
     //handle password toogles
+    const signInPassword = useRef()
     const togglePasswordShow = () => {
-
-        const passwordfield = document.querySelector('#signin_password');
-
-        if(passwordfield.getAttribute('type') === 'password'){
-            passwordfield.setAttribute('type', 'text');
+        console.log(process.env.REACT_APP_GOOGLE_CLIENT_ID)
+        if(signInPassword.current.getAttribute('type') === 'password'){
+            signInPassword.current.setAttribute('type', 'text');
             setPasswordShow(true)
         }else{
-            passwordfield.setAttribute('type', 'password');
+            signInPassword.current.setAttribute('type', 'password');
             setPasswordShow(false)
         }
     }
 
+    const registerPassword = useRef()
     const togglePasswordShowTwo = () => {
-        const passwordfield = document.querySelector('#reg_password');
 
-        if(passwordfield.getAttribute('type') === 'password'){
-            passwordfield.setAttribute('type', 'text');
+        if(registerPassword.current.getAttribute('type') === 'password'){
+            registerPassword.current.setAttribute('type', 'text');
             setRegPasswordShow(true)
         }else{
-            passwordfield.setAttribute('type', 'password');
+            registerPassword.current.setAttribute('type', 'password');
             setRegPasswordShow(false)
         }
     }
@@ -232,7 +234,7 @@ const Signin = () => {
         <div className='main_cover' style={{ backgroundColor: theme.palette.background.default }}>
             
             {/* login block */}
-            <div className='outer_container login_block'  style={{ 
+            <div className='outer_container login_block' ref={loginBlock}  style={{ 
                 backgroundColor: theme.palette.background.default, 
                 boxShadow: `0px 0px 10px 1px ${colors.grey[800]}`}}>
                 <div className='inner_container' style={{ 
@@ -276,6 +278,7 @@ const Signin = () => {
                                 style={{color: theme.palette.secondary.main}}>Password</label>
                                 <input 
                                 id="signin_password"
+                                ref={signInPassword}
                                 name="password"
                                 type='password'
                                 autocomplete="current-password"
@@ -331,7 +334,7 @@ const Signin = () => {
             </div>
             
             {/* register block */}
-            <div className='outer_container register_block'  style={{ 
+            <div className='outer_container register_block' ref={registerBlock}  style={{ 
                 backgroundColor: theme.palette.background.default, 
                 boxShadow: `0px 0px 10px 1px ${colors.grey[800]}`}}>
                 <div className='inner_container' style={{ 
@@ -399,6 +402,7 @@ const Signin = () => {
                             style={{color: theme.palette.secondary.main}}>Password</label>
                             <input 
                             id="reg_password"
+                            ref={registerPassword}
                             name="regPassword"
                             type='password'
                             autocomplete="current-password"
