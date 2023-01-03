@@ -113,9 +113,10 @@ const Signin = () => {
         });
 
     //handle password toogles
+    const key = process.env.REACT_APP_GOOGLE_CLIENT_ID
     const signInPassword = useRef()
     const togglePasswordShow = () => {
-        console.log(process.env.REACT_APP_GOOGLE_CLIENT_ID)
+        console.log(key)
         if(signInPassword.current.getAttribute('type') === 'password'){
             signInPassword.current.setAttribute('type', 'text');
             setPasswordShow(true)
