@@ -8,6 +8,7 @@ import { useGoogleLogin, GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import myFormsDataService from '../../services/myforms'
 import { registerSchema } from '../../schema';
+import {getOperatingSystem, getBrowser} from '../../utils/platform.js'
 
 const GoogleBtn = ({ id, text, onClickAction, isSubmitting}) => {
     const { theme, colorMode } = useContext(ColorModeContext)
@@ -69,9 +70,19 @@ const Signin = () => {
     const [ isSigningInWithGoogle, setIsSigningInWithGoogle] = useState(false) //for google btn loading
     const [passwordShow, setPasswordShow] = useState(false) //password show or not
     const [regPasswordShow, setRegPasswordShow] = useState(false)
-    const [googleSignType, setGoogleSignType] = useState('')
+    const deviceData = {
+        os: getOperatingSystem(window),
+        browser: getBrowser(window),
+        location: {
+            ip: null,
+            city: null,
+        }
+    }
+    // get device data on load
+    useEffect(()=>{
+        
+    },[])
     
-
     const loginBlock = useRef()
     const registerBlock = useRef()
     useEffect(()=>{
@@ -101,7 +112,6 @@ const Signin = () => {
                     setIsSigningInWithGoogle(true)
                     let res = await myFormsDataService.authGoogleUser(tokenResponse.access_token)
                     console.log('worked')
-                    console.log(googleSignType)
                     setIsSigningInWithGoogle(false)
                     navigate(`/home`, {state: { }})
                 }catch(err){
@@ -113,10 +123,10 @@ const Signin = () => {
         });
 
     //handle password toogles
-    const key = process.env.REACT_APP_GOOGLE_CLIENT_ID
+
     const signInPassword = useRef()
     const togglePasswordShow = () => {
-        console.log(key)
+
         if(signInPassword.current.getAttribute('type') === 'password'){
             signInPassword.current.setAttribute('type', 'text');
             setPasswordShow(true)
