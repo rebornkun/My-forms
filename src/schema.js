@@ -1,8 +1,8 @@
 import * as yup from 'yup';
 
 //regex
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,4}$/i
-const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{5,}$/;
+export const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,4}$/i
+export const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{5,}$/;
 //min 5 characters, 1 upper case letter, 1 lower case letter, 1 numeric digit
 
 export const registerSchema = yup.object().shape({

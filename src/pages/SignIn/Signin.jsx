@@ -7,7 +7,7 @@ import jwtDecode from 'jwt-decode';
 import { useGoogleLogin, GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import myFormsDataService from '../../services/myforms'
-import { registerSchema } from '../../schema';
+import { registerSchema, emailRegex, passwordRegex } from '../../schema';
 import {getOperatingSystem, getBrowser} from '../../utils/platform.js'
 
 const GoogleBtn = ({ id, text, onClickAction, isSubmitting}) => {
@@ -96,11 +96,6 @@ const Signin = () => {
         }
 
     },[location])
-
-    //regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,4}$/i
-    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{5,}$/;
-    //min 5 characters, 1 upper case letter, 1 lower case letter, 1 numeric digit
 
     // const key = process.env.REACT_APP_GOOGLE_CLIENT_ID
     // console.log(key)
