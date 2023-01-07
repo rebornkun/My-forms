@@ -78,10 +78,6 @@ const Signin = () => {
             city: null,
         }
     }
-    // get device data on load
-    useEffect(()=>{
-        
-    },[])
     
     const loginBlock = useRef()
     const registerBlock = useRef()
