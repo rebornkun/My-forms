@@ -3,9 +3,7 @@ import { ColorModeContext, tokens } from "../../theme";
 import { Component, useContext, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Formik, useFormik } from 'formik';
-import jwtDecode from 'jwt-decode';
 import { useGoogleLogin, GoogleLogin } from '@react-oauth/google';
-import axios from 'axios';
 import myFormsDataService from '../../services/myforms'
 import { registerSchema, emailRegex, passwordRegex } from '../../schema';
 import {getOperatingSystem, getBrowser} from '../../utils/platform.js'
@@ -210,13 +208,12 @@ const Signin = () => {
     }
 
     //handle registration validation using formik
-
     const onSubmit = async (values, actions) => {
         console.log('submitted')
-        console.log(values)
-        console.log(actions)
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        actions.resetForm()
+        const registerUser = myFormsDataService.registerUser(values)
+        // console.log(values)
+        // console.log(actions)
+        // actions.resetForm()
     }
 
     const { values, handleBlur, handleChange, handleSubmit, errors, touched, isSubmitting } = useFormik({

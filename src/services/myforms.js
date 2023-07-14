@@ -8,9 +8,9 @@ class myFormsDataService {
         return axios.get(`${baseUrl}/googleapi/${token}`);
     }
 
-    // registerUser(data){
-    //     return axios.post(`${baseUrl}/register`, data);
-    // }
+    registerUser(data){
+        return axios.post(`${baseUrl}/register`, data);
+    }
 
     // loginUser(data){
     //     return axios.post(`${baseUrl}/login`, data);
